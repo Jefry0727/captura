@@ -2,35 +2,50 @@ package co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto;
 
 import java.io.Serializable;
 
+import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.modelo.Usuario;
+
 public class SolicitarConexionDTO implements Serializable {
 
-	private String ipCliente;
-	private String ipDestino;
+	private Usuario ipCliente;
+	private Usuario ipDestino;
+	private String estado;
 
 	public SolicitarConexionDTO() {
 		
 	}
 
-	public SolicitarConexionDTO(String ipCli, String ipDest) {
-		this.ipCliente = ipCli;
-		this.ipDestino = ipDest;
+	public SolicitarConexionDTO(Usuario Cli, Usuario Dest,String est) {
+		this.ipCliente = Cli;
+		this.ipDestino = Dest;
+		this.estado=est;
+	}
+	
+	
+
+	public String getEstado() {
+		return estado;
 	}
 
-	public String getIpCliente() {
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public Usuario getIpCliente() {
 		return ipCliente;
 	}
 
-	public void setIpCliente(String ipCliente) {
+	public void setIpCliente(Usuario ipCliente) {
 		this.ipCliente = ipCliente;
 	}
 
-	public String getIpDestino() {
+	public Usuario getIpDestino() {
 		return ipDestino;
 	}
 
-	public void setIpDestino(String ipDestino) {
+	public void setIpDestino(Usuario ipDestino) {
 		this.ipDestino = ipDestino;
 	}
+
 	
 	
 

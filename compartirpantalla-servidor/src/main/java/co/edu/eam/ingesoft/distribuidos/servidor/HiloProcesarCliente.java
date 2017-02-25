@@ -90,6 +90,7 @@ public class HiloProcesarCliente implements Runnable {
 
 				try {
 					System.out.println("esperando mensaje.......................");
+					//Obtuvimos el objeto que llega del cliente (con)
 					Object obj = entrada.readObject();
 					
 					if (obj instanceof LoginDTO) {
@@ -130,9 +131,19 @@ public class HiloProcesarCliente implements Runnable {
 					}
 					
 					if(obj instanceof SolicitarConexionDTO){
-						System.out.println("solicito conexion..............");
-						SolicitarConexionDTO dot = (SolicitarConexionDTO) obj;
-						System.out.println("C"+dot.getIpCliente()+",D"+dot.getIpDestino());
+						SolicitarConexionDTO dto = (SolicitarConexionDTO)obj;
+						//System.out.println("Aqui llega el dto hilo procesar un: "+dto.getEstado()+","+dto.getIpCliente().getUsuario());
+						if(dto.getEstado().equals("ACEPTADO")){
+							
+							servidor.enviarA(dto);
+						}else{
+							SolicitarConexionDTO dto2 = new SolicitarConexionDTO(dto.getIpCliente(),dto.getIpDestino(),"PRIMERA");						
+							servidor.enviarA(dto2);
+							
+						}
+						
+						
+						
 					}
 
 				} catch (Exception e) {
@@ -141,6 +152,7 @@ public class HiloProcesarCliente implements Runnable {
 				}
 
 			}
+			
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			return;
@@ -165,7 +177,6 @@ public class HiloProcesarCliente implements Runnable {
 	 * @throws IOException
 	 */
 	public void enviarMsj(Object obj) throws IOException {
-		System.out.println("es un: "+obj);
 		salida.writeObject(obj);
 		salida.flush();
 	}

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.SolicitarConexionDTO;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.modelo.Usuario;
 import co.edu.eam.ingesoft.distribuidos.servidor.logica.Logica;
 
@@ -33,9 +34,8 @@ public class Servidor implements Runnable {
 				try {
 					System.out.println("esperando usuario..................");
 					Socket con = soc.accept();
-					HiloProcesarCliente cliente = new HiloProcesarCliente(con, this, logica);
-
-					pool.execute(cliente);
+					HiloProcesarCliente cliente = new HiloProcesarCliente(con, this, logica);					
+					pool.execute(cliente);			
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -57,8 +57,7 @@ public class Servidor implements Runnable {
 	 * @throws IOException
 	 */
 	public void enviarTodos(Object obj) throws IOException {
-		for (Map.Entry<String, HiloProcesarCliente> entry : clientesConectados.entrySet()) {
-			
+		for (Map.Entry<String, HiloProcesarCliente> entry : clientesConectados.entrySet()) {			
 			HiloProcesarCliente cli = entry.getValue();
 			System.out.println("enviando a todos:"+cli.getUsuario().getUsuario());
 			cli.enviarMsj(obj);
@@ -102,7 +101,33 @@ public class Servidor implements Runnable {
 		clientesConectados.remove(cliente.getUsuario().getUsuario());
 	}
 	
-	
+	/**
+	 * metodo para enviar a
+	 * 
+	 * @param obj
+	 * @throws IOException
+	 */
+	public void enviarA(Object obj) throws IOException {
+		//Obtenemos el objeto
+		SolicitarConexionDTO dto = (SolicitarConexionDTO)obj;
+		//ponemos el usuario destino
+		String usuarioDes = dto.getIpDestino().getUsuario();
+		for (Map.Entry<String, HiloProcesarCliente> entry : clientesConectados.entrySet()) {			
+			HiloProcesarCliente cli = entry.getValue();
+			if(dto.getEstado().equals("PRIMERA")){
+				if(usuarioDes.equals(cli.getUsuario().getUsuario())){				
+					cli.enviarMsj(dto);
+					System.out.println("este es el destino: "+dto.getIpDestino().getUsuario());
+				}
+			}			
+			if(dto.getEstado().equals("ACEPTADO")){
+				if(dto.getIpCliente().getUsuario().equals(cli.getUsuario().getUsuario())){				
+					cli.enviarMsj(dto);
+					System.out.println("este es el origen: "+dto.getIpCliente().getUsuario());
+				}
+			}
+		}
+	}
 	
 	public static void main(String[] args) {
 		new Thread(new Servidor()).start();

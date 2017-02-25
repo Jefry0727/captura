@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import co.edu.eam.ingesoft.distribuidos.cliente.controlador.Controlador;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.ListaUsuariosDTO;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.SolicitarConexionDTO;
+import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.modelo.Usuario;
 
 /**
  *
@@ -128,24 +129,14 @@ public class Ventana extends javax.swing.JFrame implements Observer {
     }//GEN-LAST:event_btnEnviartxtActionPerformed
 
     private void btnCompartirPantallaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCompartirPantallaActionPerformed
-        
-    	String usu = listaUsuarios.getSelectedValue().toString();
-        System.out.println(""+usu);
-        String[] usuario = usu.split("-");
-        try {
-			SolicitarConexionDTO dto = new SolicitarConexionDTO(
-					InetAddress.getLocalHost().getHostAddress(),usuario[1]);
-			control.enviarMsj(dto);
-			
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
+        //Se obtiene el valor del usuario a pedir peticion
+    	Usuario usu = (Usuario) listaUsuarios.getSelectedValue(); 
     	
+    	//Setear los datos en el dto
+		SolicitarConexionDTO dto = new SolicitarConexionDTO(null,usu,null);
+		
+		//Mandamos el objeto al metodo controlador
+    	control.solicitarCompartir(dto);
     	
     }//GEN-LAST:event_btnCompartirPantallaActionPerformed
 

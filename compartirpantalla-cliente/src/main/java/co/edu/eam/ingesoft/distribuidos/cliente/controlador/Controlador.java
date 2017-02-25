@@ -9,9 +9,16 @@ import java.net.Socket;
 import java.util.List;
 import java.util.Observable;
 
+import javax.swing.JOptionPane;
+
+import co.edu.eam.ingesoft.distribuidos.cliente.gui.Pantalla;
+import co.edu.eam.ingesoft.distribuidos.cliente.gui.Ventana;
+import co.edu.eam.ingesoft.distribuidos.cliente.hilos.HiloDestino;
+import co.edu.eam.ingesoft.distribuidos.cliente.hilos.HiloOrigen;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.ListaUsuariosDTO;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.LoginDTO;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.RegistroDTO;
+import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.SolicitarConexionDTO;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.modelo.Usuario;
 
 /**
@@ -23,10 +30,12 @@ import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.modelo.Usuario;
 public class Controlador extends Observable implements Runnable {
 
 	private Socket con;
+	private Socket con2;
 	private ObjectOutputStream salida;
 	private ObjectInputStream entrada;
-
+	private HiloDestino hiloDe;
 	private List<Usuario> usuarios;
+	private SolicitarConexionDTO dto2;
 	/**
 	 * mi usuario
 	 */
@@ -132,6 +141,55 @@ public class Controlador extends Observable implements Runnable {
 					setChanged();
 					notifyObservers(lista);
 				}
+				
+				if(obj instanceof SolicitarConexionDTO){
+					//hilo destino
+					
+					
+					System.out.println(" ip del alguien"+con.getInetAddress().getHostAddress());
+					//pantalla a compartir
+					Pantalla p = new Pantalla(hiloDe);
+					//casteo el objeto
+					SolicitarConexionDTO dto = (SolicitarConexionDTO) obj;
+					
+					System.out.println(dto.getEstado()+"jjjjjjjjjjjjj");
+					
+					if(dto.getEstado().equals("PRIMERA")){
+						//System.out.println("llego a cli destino: "+dto.getIpDestino().getUsuario());
+						int resp = JOptionPane.showConfirmDialog(null, "Desea aceptar conexion con "+dto.getIpCliente().getUsuario());
+						
+						if(resp == 0){
+							dto2 = new SolicitarConexionDTO(dto.getIpCliente(),dto.getIpDestino(),"ACEPTADO");
+							enviarMsj(dto2);
+							
+							System.out.println("despues de enviar mesaja cuando se acepta ");
+							
+							p.setVisible(true);
+							
+							con2 = new Socket("localhost", 45001);
+							hiloDe = new HiloDestino(con2);
+							new Thread(hiloDe).start();
+							
+							
+						}
+						System.out.println("que mierda esta llegando aqui: "+dto.getEstado());
+						if(dto.getEstado().equals("ACEPTADO")){
+						
+							System.out.println("SI BER");
+							//System.out.println("Esta entrando por aqui: ");
+							con2 = new Socket("localhost", 45001);
+							hiloDe = new HiloDestino(con);
+							//SolicitarConexionDTO dt = (SolicitarConexionDTO) entrada.readObject();
+							JOptionPane.showMessageDialog(null,"Solicitud aceptada");
+							
+							HiloOrigen hiloOr = new HiloOrigen(con2);
+							new Thread(hiloOr).start();
+						}
+					}
+					
+					
+					
+				}
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -160,6 +218,20 @@ public class Controlador extends Observable implements Runnable {
 	
 	public Usuario getUsuario() {
 		return usuario;
+	}
+	
+	public void solicitarCompartir(Object o){
+		//se castea el objeto que llego por parametro a un dto
+		SolicitarConexionDTO dto = (SolicitarConexionDTO) o;
+		//setear los datos en el objeto que se va a enviar a HiloProcesarCliente
+		SolicitarConexionDTO dto2 = new SolicitarConexionDTO(this.usuario,dto.getIpDestino(),"PRIMERA");
+		try {	
+			//Se enviar el objeto al Hilo Procesar Cliente
+			enviarMsj(dto2);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
