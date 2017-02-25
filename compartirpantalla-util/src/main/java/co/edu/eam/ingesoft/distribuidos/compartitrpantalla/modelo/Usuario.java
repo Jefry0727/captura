@@ -69,9 +69,12 @@ public class Usuario implements Serializable{
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
-		return usuario+"-"+ip;
+		return "Usuario [usuario=" + usuario + ", ip=" + ip + "]";
 	}
 	
 	

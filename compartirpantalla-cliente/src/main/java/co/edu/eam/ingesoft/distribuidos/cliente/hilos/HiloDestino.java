@@ -10,8 +10,8 @@ public class HiloDestino extends Observable implements Runnable {
 	private Socket con;
 	private ObjectInputStream entrada;
 
-	public HiloDestino(Socket con) {
-		this.con = con;
+	public HiloDestino() {
+//		this.con = con;
 	}
 
 	@Override

@@ -31,10 +31,10 @@ public class HiloOrigen implements Runnable {
 	public void run() {
 
 		try {
-
+			//se instancia lo que se va a mandar
+			salida = new ObjectOutputStream(soc.getOutputStream());
 			while (true) {
-				//se instancia lo que se va a mandar
-				salida = new ObjectOutputStream(soc.getOutputStream());
+				
 				//aqui se obtendra el capturar la pantalla
 				byte[] arre = getDesktop();
 				//se envia los bytes que representan la pantalla
@@ -53,7 +53,7 @@ public class HiloOrigen implements Runnable {
 
 	/**
 	 * 
-	 * Método que captura un pantallazo. <br>
+	 * Mï¿½todo que captura un pantallazo. <br>
 	 * 
 	 * @author Camilo Andres Ferrer Bustos<br>
 	 * 

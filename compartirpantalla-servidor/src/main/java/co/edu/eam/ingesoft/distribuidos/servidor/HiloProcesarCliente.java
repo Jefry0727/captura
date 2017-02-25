@@ -131,16 +131,21 @@ public class HiloProcesarCliente implements Runnable {
 					}
 					
 					if(obj instanceof SolicitarConexionDTO){
+						
 						SolicitarConexionDTO dto = (SolicitarConexionDTO)obj;
+						
 						//System.out.println("Aqui llega el dto hilo procesar un: "+dto.getEstado()+","+dto.getIpCliente().getUsuario());
 						if(dto.getEstado().equals("ACEPTADO")){
+							
 							//se envia el objeto dto al metodo enviarA
-							servidor.enviarA(dto);
+							
+							servidor.enviarA(dto,dto.getIpCliente().getUsuario());
+							
 						}else{
 							//Se obtienen los datos y se le castea el estado por un "PRIMERA"
 							SolicitarConexionDTO dto2 = new SolicitarConexionDTO(dto.getIpCliente(),dto.getIpDestino(),"PRIMERA");						
 							//se le envia el objeto dto2 a el metodo enviarA
-							servidor.enviarA(dto2);
+							servidor.enviarA(dto2,dto.getIpDestino().getUsuario());
 							
 						}
 						

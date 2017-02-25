@@ -107,26 +107,36 @@ public class Servidor implements Runnable {
 	 * @param obj
 	 * @throws IOException
 	 */
-	public void enviarA(Object obj) throws IOException {
+	public void enviarA(Object obj,String to) throws IOException {
 		//Obtenemos el objeto
-		SolicitarConexionDTO dto = (SolicitarConexionDTO)obj;
-		//ponemos el usuario destino
-		String usuarioDes = dto.getIpDestino().getUsuario();
-		for (Map.Entry<String, HiloProcesarCliente> entry : clientesConectados.entrySet()) {			
-			HiloProcesarCliente cli = entry.getValue();
-			if(dto.getEstado().equals("PRIMERA")){
-				if(usuarioDes.equals(cli.getUsuario().getUsuario())){				
-					cli.enviarMsj(dto);
-					System.out.println("este es el destino: "+dto.getIpDestino().getUsuario());
-				}
-			}			
-			if(dto.getEstado().equals("ACEPTADO")){
-				if(dto.getIpCliente().getUsuario().equals(cli.getUsuario().getUsuario())){				
-					cli.enviarMsj(dto);
-					System.out.println("este es el origen: "+dto.getIpCliente().getUsuario());
-				}
-			}
-		}
+		
+		clientesConectados.get(to).enviarMsj(obj);
+		
+//		SolicitarConexionDTO dto = (SolicitarConexionDTO)obj;
+//		
+//		//ponemos el usuario destino
+//		String usuarioDes = dto.getIpDestino().getUsuario();
+//		
+//		for (Map.Entry<String, HiloProcesarCliente> entry : clientesConectados.entrySet()) {			
+//			HiloProcesarCliente cli = entry.getValue();
+//			if(dto.getEstado().equals("PRIMERA")){
+//				if(usuarioDes.equals(cli.getUsuario().getUsuario())){				
+//					cli.enviarMsj(dto);
+//					System.out.println("este es el destino: "+dto.getIpDestino().getUsuario());
+//				}
+//			}	
+//			
+//			if(dto.getEstado().equals("ACEPTADO")){
+//				
+//				if(dto.getIpCliente().getUsuario().equals(cli.getUsuario().getUsuario())){	
+//					
+//					cli.enviarMsj(dto);
+//					
+//					System.out.println("este es el origen: "+dto.getIpCliente().getUsuario());
+//					
+//				}
+//			}
+//		}
 	}
 	
 	public static void main(String[] args) {

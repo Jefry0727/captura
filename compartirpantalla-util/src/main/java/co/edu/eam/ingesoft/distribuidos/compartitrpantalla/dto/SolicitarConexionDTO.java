@@ -46,7 +46,17 @@ public class SolicitarConexionDTO implements Serializable {
 		this.ipDestino = ipDestino;
 	}
 
-	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "SolicitarConexionDTO [ipCliente=" + ipCliente + ", ipDestino=" + ipDestino + ", estado=" + estado + "]";
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	
 
 }
