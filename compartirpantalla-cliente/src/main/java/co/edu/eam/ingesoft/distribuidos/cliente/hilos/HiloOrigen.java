@@ -33,9 +33,13 @@ public class HiloOrigen implements Runnable {
 		try {
 
 			while (true) {
+				//se instancia lo que se va a mandar
 				salida = new ObjectOutputStream(soc.getOutputStream());
+				//aqui se obtendra el capturar la pantalla
 				byte[] arre = getDesktop();
+				//se envia los bytes que representan la pantalla
 				salida.writeObject(arre);
+				//no se
 				salida.flush();
 			}
 

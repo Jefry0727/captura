@@ -150,24 +150,27 @@ public class Controlador extends Observable implements Runnable {
 					//pantalla a compartir
 					Pantalla p = new Pantalla(hiloDe);
 					//casteo el objeto
-					SolicitarConexionDTO dto = (SolicitarConexionDTO) obj;
+					SolicitarConexionDTO dto = (SolicitarConexionDTO) obj;					
 					
-					System.out.println(dto.getEstado()+"jjjjjjjjjjjjj");
-					
+					//Se mira si es la primera vez que envia peticion
 					if(dto.getEstado().equals("PRIMERA")){
 						//System.out.println("llego a cli destino: "+dto.getIpDestino().getUsuario());
 						int resp = JOptionPane.showConfirmDialog(null, "Desea aceptar conexion con "+dto.getIpCliente().getUsuario());
 						
 						if(resp == 0){
+							//Se obtienen los datos del objeto que llego y se le castea a Aceptado
 							dto2 = new SolicitarConexionDTO(dto.getIpCliente(),dto.getIpDestino(),"ACEPTADO");
+							//Se envia al hilo procesar cliente
 							enviarMsj(dto2);
 							
-							System.out.println("despues de enviar mesaja cuando se acepta ");
-							
+							System.out.println("despues de enviar mensaja cuando se acepta ");
+							//se muestra la pantalla
 							p.setVisible(true);
-							
+							//Se le asigna local host y puerto al socket
 							con2 = new Socket("localhost", 45001);
+							//se le envia al hilo destino el socket
 							hiloDe = new HiloDestino(con2);
+							//se corre el hilo destino
 							new Thread(hiloDe).start();
 							
 							
@@ -176,13 +179,14 @@ public class Controlador extends Observable implements Runnable {
 						if(dto.getEstado().equals("ACEPTADO")){
 						
 							System.out.println("SI BER");
-							//System.out.println("Esta entrando por aqui: ");
+							//lo mismo de arriba
 							con2 = new Socket("localhost", 45001);
 							hiloDe = new HiloDestino(con);
 							//SolicitarConexionDTO dt = (SolicitarConexionDTO) entrada.readObject();
 							JOptionPane.showMessageDialog(null,"Solicitud aceptada");
-							
+							// se le envia  el socket al hilo origen
 							HiloOrigen hiloOr = new HiloOrigen(con2);
+							//se corre el hilo origen
 							new Thread(hiloOr).start();
 						}
 					}
