@@ -11,6 +11,7 @@ import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.ListaUsuariosDTO;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.LoginDTO;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.RegistroDTO;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.SolicitarConexionDTO;
+import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.SolicitarVideoDTO;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.modelo.Usuario;
 import co.edu.eam.ingesoft.distribuidos.servidor.logica.Logica;
 
@@ -90,9 +91,9 @@ public class HiloProcesarCliente implements Runnable {
 
 				try {
 					System.out.println("esperando mensaje.......................");
-					//Obtuvimos el objeto que llega del cliente (con)
+					// Obtuvimos el objeto que llega del cliente (con)
 					Object obj = entrada.readObject();
-					
+
 					if (obj instanceof LoginDTO) {
 						System.out.println("LOGIN.......................");
 
@@ -100,7 +101,7 @@ public class HiloProcesarCliente implements Runnable {
 						// si es valido el usuario
 
 						if (logica.verificarUsuario(dto)) {
-							List<Usuario> usuarios = servidor.listarUsuarios();							
+							List<Usuario> usuarios = servidor.listarUsuarios();
 							usuario = new Usuario();
 							usuario.setUsuario(dto.getUsuario());
 							usuario.setIp(ip);
@@ -119,9 +120,9 @@ public class HiloProcesarCliente implements Runnable {
 						System.out.println("registro usuario.......................");
 
 						RegistroDTO dto = (RegistroDTO) obj;
-						
+
 						// si es valido el usuario
-						if (logica.crearUsuario(dto,ip)) {
+						if (logica.crearUsuario(dto, ip)) {
 							enviarMsj("OK");
 							logica.actualizarUsuario(ip, dto.getUsuario());
 
@@ -129,28 +130,55 @@ public class HiloProcesarCliente implements Runnable {
 							enviarMsj("ERROR");
 						}
 					}
-					
-					if(obj instanceof SolicitarConexionDTO){
-						
-						SolicitarConexionDTO dto = (SolicitarConexionDTO)obj;
-						
-						//System.out.println("Aqui llega el dto hilo procesar un: "+dto.getEstado()+","+dto.getIpCliente().getUsuario());
-						if(dto.getEstado().equals("ACEPTADO")){
-							
-							//se envia el objeto dto al metodo enviarA
-							
-							servidor.enviarA(dto,dto.getIpCliente().getUsuario());
-							
-						}else{
-							//Se obtienen los datos y se le castea el estado por un "PRIMERA"
-							SolicitarConexionDTO dto2 = new SolicitarConexionDTO(dto.getIpCliente(),dto.getIpDestino(),"PRIMERA");						
-							//se le envia el objeto dto2 a el metodo enviarA
-							servidor.enviarA(dto2,dto.getIpDestino().getUsuario());
-							
+
+					if (obj instanceof SolicitarConexionDTO) {
+
+						SolicitarConexionDTO dto = (SolicitarConexionDTO) obj;
+
+						// System.out.println("Aqui llega el dto hilo procesar
+						// un:
+						// "+dto.getEstado()+","+dto.getIpCliente().getUsuario());
+						if (dto.getEstado().equals("ACEPTADO")) {
+
+							// se envia el objeto dto al metodo enviarA
+
+							servidor.enviarA(dto, dto.getIpCliente().getUsuario());
+
+						} else {
+							// Se obtienen los datos y se le castea el estado
+							// por un "PRIMERA"
+							SolicitarConexionDTO dto2 = new SolicitarConexionDTO(dto.getIpCliente(), dto.getIpDestino(),
+									"PRIMERA");
+							// se le envia el objeto dto2 a el metodo enviarA
+							servidor.enviarA(dto2, dto.getIpDestino().getUsuario());
+
 						}
-						
-						
-						
+
+					}
+
+					if (obj instanceof SolicitarVideoDTO) {
+
+						SolicitarVideoDTO dto = (SolicitarVideoDTO) obj;
+
+						// System.out.println("Aqui llega el dto hilo procesar
+						// un:
+						// "+dto.getEstado()+","+dto.getIpCliente().getUsuario());
+						if (dto.getEstado().equals("ACEPTADO")) {
+
+							// se envia el objeto dto al metodo enviarA
+
+							servidor.enviarA(dto, dto.getIpCliente().getUsuario());
+
+						} else {
+							// Se obtienen los datos y se le castea el estado
+							// por un "PRIMERA"
+							SolicitarVideoDTO dto2 = new SolicitarVideoDTO(dto.getIpCliente(), dto.getIpDestino(),
+									"PRIMERA");
+							// se le envia el objeto dto2 a el metodo enviarA
+							servidor.enviarA(dto2, dto.getIpDestino().getUsuario());
+
+						}
+
 					}
 
 				} catch (Exception e) {
@@ -159,7 +187,7 @@ public class HiloProcesarCliente implements Runnable {
 				}
 
 			}
-			
+
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			return;

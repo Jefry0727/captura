@@ -3,7 +3,7 @@ package co.edu.eam.ingesoft.distribuidos.cliente.controlador;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Inet4Address;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
@@ -12,13 +12,16 @@ import java.util.Observable;
 import javax.swing.JOptionPane;
 
 import co.edu.eam.ingesoft.distribuidos.cliente.gui.Pantalla;
-import co.edu.eam.ingesoft.distribuidos.cliente.gui.Ventana;
+import co.edu.eam.ingesoft.distribuidos.cliente.gui.Video;
+import co.edu.eam.ingesoft.distribuidos.cliente.hilos.EntradaVideo;
 import co.edu.eam.ingesoft.distribuidos.cliente.hilos.HiloDestino;
 import co.edu.eam.ingesoft.distribuidos.cliente.hilos.HiloOrigen;
+import co.edu.eam.ingesoft.distribuidos.cliente.hilos.SalidaVideo;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.ListaUsuariosDTO;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.LoginDTO;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.RegistroDTO;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.SolicitarConexionDTO;
+import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.dto.SolicitarVideoDTO;
 import co.edu.eam.ingesoft.distribuidos.compartitrpantalla.modelo.Usuario;
 
 /**
@@ -34,9 +37,10 @@ public class Controlador extends Observable implements Runnable {
 	private ObjectOutputStream salida;
 	private ObjectInputStream entrada;
 	private HiloDestino hiloDe;
-	private HiloOrigen hiloOri;
+	private SalidaVideo salidaVideo;
 	private List<Usuario> usuarios;
 	private SolicitarConexionDTO dto2;
+	private SolicitarVideoDTO dtoVideo;
 	/**
 	 * mi usuario
 	 */
@@ -200,6 +204,59 @@ public class Controlador extends Observable implements Runnable {
 					}
 
 				}
+				
+				//--------------------------------------------------
+				
+				if (obj instanceof SolicitarVideoDTO) {
+					// hilo destino
+					System.out.println(usuario.getUsuario() + "::" + obj);
+
+					System.out.println(" ip del alguien" + con.getInetAddress().getHostAddress());
+					// pantalla a compartir
+					
+					// casteo el objeto
+					SolicitarVideoDTO dto = (SolicitarVideoDTO) obj;
+
+					// Se mira si es la primera vez que envia peticion
+					if (dto.getEstado().equals("PRIMERA")) {
+						// System.out.println("llego a cli destino:
+						// "+dto.getIpDestino().getUsuario());
+						int resp = JOptionPane.showConfirmDialog(null,
+								"Desea aceptar llamada? " + dto.getIpCliente().getUsuario());
+
+						if (resp == 0) {
+
+							EntradaVideo e= new EntradaVideo();
+							// se corre el hilo destino
+							new Thread(e).start();
+
+							// Se obtienen los datos del objeto que llego y se
+							// le castea a Aceptado
+							dtoVideo = new SolicitarVideoDTO(dto.getIpCliente(), dto.getIpDestino(), "ACEPTADO");
+							// Se envia al hilo procesar cliente
+							enviarMsj(dtoVideo);
+
+							System.out.println("despues de enviar mensaja cuando se acepta ");
+							// se muestra la pantalla
+							Video v = new Video(e);
+							e.addObserver(v);
+							v.setVisible(true);
+
+						}
+					}
+					System.out.println("que mierda esta llegando aqui: " + dto.getEstado());
+					if (dto.getEstado().equals("ACEPTADO")) {
+
+						DatagramSocket dts = new DatagramSocket();
+						
+						salidaVideo = new SalidaVideo(dts);
+						
+						new Thread(salidaVideo).start();				
+					}
+
+				}
+				
+				
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -244,4 +301,20 @@ public class Controlador extends Observable implements Runnable {
 		}
 	}
 
+	
+	public void solicitarVideo(Object o) {
+		// se castea el objeto que llego por parametro a un dto
+		SolicitarVideoDTO dto = (SolicitarVideoDTO) o;
+		// setear los datos en el objeto que se va a enviar a
+		// HiloProcesarCliente
+		SolicitarVideoDTO dto2 = new SolicitarVideoDTO(this.usuario, dto.getIpDestino(), "PRIMERA");
+		try {
+			// Se enviar el objeto al Hilo Procesar Cliente
+			enviarMsj(dto2);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 }
