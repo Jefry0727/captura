@@ -244,7 +244,7 @@ public class Controlador extends Observable implements Runnable {
 
 						}
 					}
-					System.out.println("que mierda esta llegando aqui: " + dto.getEstado());
+					
 					if (dto.getEstado().equals("ACEPTADO")) {
 
 						DatagramSocket dts = new DatagramSocket();
